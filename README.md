@@ -15,7 +15,7 @@ Run the Jar file:
 ```
 java -jar build/libs/LibraryAPI-0.0.1-SNAPSHOT.jar
 ```
-The service should now be up and running on http://localhost:8080.
+The service should now be up and running on http://localhost:8080/users/.
 
 ## Example requests:
 
@@ -43,9 +43,9 @@ Response
 HTTP/1.1 200
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
-Date: Mon, 09 Oct 2017 21:07:16 GMT
+Date: Mon, 09 Oct 2017 21:54:25 GMT
 
-[{"id":1,"title":"Power of Habits","author":"Amir Khodaei"},{"id":2,"title":"title2","author":"author2"}]
+[{"id":1,"title":"The Power of Habit","author":"Charles Duhigg"},{"id":2,"title":"The Pragmatic Programmer","author":"Andrew Hunt"}]
 ```
 ### create user 
 Request:
@@ -101,9 +101,9 @@ Response:
 HTTP/1.1 200
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
-Date: Mon, 09 Oct 2017 21:16:08 GMT
+Date: Mon, 09 Oct 2017 21:56:06 GMT
 
-[{"bookId":1,"title":"Power of Habits","author":"Amir Khodaei","status":"UNREAD"},{"bookId":3,"title":"Title 1","author":"author","status":"UNREAD"}]
+[{"bookId":1,"title":"The Power of Habit","author":"Charles Duhigg","status":"UNREAD"},{"bookId":3,"title":"title2","author":"author2","status":"UNREAD"}]
 ```
 #### list books by author
 Request:
@@ -120,33 +120,47 @@ Date: Mon, 09 Oct 2017 21:22:14 GMT
 [{"bookId":3,"title":"title2","author":"author2","status":"UNREAD"}]
 ```
 #### list books by status
-Request:
+List unread books request:
 ```
-curl -i 'localhost:8080/users/amir/books?status=read'
+curl -i 'localhost:8080/users/amir/books?status=unread'
 ```
 Response:
 ```
 HTTP/1.1 200
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
-Date: Mon, 09 Oct 2017 21:24:10 GMT
+Date: Mon, 09 Oct 2017 21:57:57 GMT
 
-[]
+[{"bookId":1,"title":"The Power of Habit","author":"Charles Duhigg","status":"UNREAD"},{"bookId":3,"title":"title2","author":"author2","status":"UNREAD"}]
 ```
-Request:
+Mark one book as read and list read books:
 ```
-curl -i 'localhost:8080/users/amir/books?status=unread'
+curl -i -X PUT -H "Content-Type:application/json" localhost:8080/users/amir/books/3 -d '{"status": "read"}'
+curl -i 'localhost:8080/users/amir/books?status=read'
 ```
-Response:
+Response: 
 ```
+HTTP/1.1 200
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Mon, 09 Oct 2017 22:10:06 GMT
+
+[{"bookId":3,"title":"title2","author":"author2","status":"READ"}]
 ```
 #### list books by both author and status
 Request:
 ```
-curl -i 'localhost:8080/users/amir/books?author=andrew hunt&status=unread'
+curl -i 'http://localhost:8080/users/amir/books?author=charles%20duhigg&status=unread'
 ```
 Response:
+```
+HTTP/1.1 200
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Mon, 09 Oct 2017 22:02:07 GMT
 
+[{"bookId":1,"title":"The Power of Habit","author":"Charles Duhigg","status":"UNREAD"}]
+```
 ### delete book from user library
 Request:
 ```
@@ -159,26 +173,33 @@ Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
 Date: Mon, 09 Oct 2017 21:30:04 GMT
 ```
-list books:
+list books after deleting book with bookId=1:
 ```
+curl -i localhost:8080/users/amir/books
+HTTP/1.1 200
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Mon, 09 Oct 2017 22:05:00 GMT
+
+[{"bookId":3,"title":"title2","author":"author2","status":"UNREAD"}]
 ```
 ### mark book
 Mark as read request:
 ```
-curl -i -X POST -H "Content-Type:application/json" localhost:8080/users/amir/books/2 -d '{"status": "read"}'
+curl -i -X PUT -H "Content-Type:application/json" localhost:8080/users/amir/books/3 -d '{"status": "read"}'
 ```
 Response:
 ```
 HTTP/1.1 200
 Content-Type: application/json;charset=UTF-8
 Transfer-Encoding: chunked
-Date: Mon, 09 Oct 2017 21:33:51 GMT
+Date: Mon, 09 Oct 2017 22:05:58 GMT
 
-{"bookId":2,"title":"title2","author":"author2","status":"READ"}
+{"bookId":3,"title":"title2","author":"author2","status":"READ"}
 ```
 Mark as unread request:
 ```
-curl -i -X POST -H "Content-Type:application/json" localhost:8080/users/amir/books/2 -d '{"status": "unread"}'
+curl -i -X POST -H "Content-Type:application/json" localhost:8080/users/amir/books/3 -d '{"status": "unread"}'
 ```
 Response:
 ```
