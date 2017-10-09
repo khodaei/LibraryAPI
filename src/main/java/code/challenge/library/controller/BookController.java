@@ -6,8 +6,11 @@ import code.challenge.library.service.BookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 
 @RestController
@@ -19,11 +22,13 @@ public class BookController {
     private BookService bookService;
 
     @PostMapping(value = "")
-    public Book create(@RequestBody Book book) {
+    public Book create(@RequestBody Book book, HttpServletResponse response) {
         if(StringUtils.isEmpty(book.getAuthor()) || StringUtils.isEmpty(book.getTitle())) {
             throw new IllegalArgumentException("author and title must be specified");
         }
-        return bookService.create(book);
+        Book bookCreated = bookService.create(book);
+        response.setStatus(HttpStatus.CREATED.value());
+        return bookCreated;
     }
 
     @GetMapping(value = "/{id}")

@@ -9,9 +9,11 @@ import code.challenge.library.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -37,11 +39,14 @@ public class UserController {
      * @return      user instance create
      */
     @PostMapping(value = "")
-    public User create(@RequestBody User user) {
+    public User create(@RequestBody User user, HttpServletResponse response) {
         if(StringUtils.isEmpty(user.getUsername())) {
             throw new IllegalArgumentException("Invalid username");
         }
-        return userService.create(user);
+
+        User userCreated = userService.create(user);
+        response.setStatus(HttpStatus.CREATED.value());
+        return userCreated;
     }
 
     /**
@@ -90,7 +95,7 @@ public class UserController {
      * @param book
      * @return book instance that was modified
      */
-    @PostMapping("/{username}/books/{bookId}")
+    @PutMapping("/{username}/books/{bookId}")
     public Book markBookInLibrary(@PathVariable String username,
                                   @PathVariable Long bookId,
                                   @RequestBody Book book) {
