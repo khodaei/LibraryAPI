@@ -15,7 +15,10 @@ Run the Jar file:
 ```
 java -jar build/libs/LibraryAPI-0.0.1-SNAPSHOT.jar
 ```
-The service should now be up and running on http://localhost:8080/users/.
+The service should now be up and running on http://localhost:8080/ which will show an error page since no resources are attached to this URI.
+
+### Note
+I'm using an in-memory embedded database H2 simplify setting up and running the project.
 
 ## Example requests:
 
