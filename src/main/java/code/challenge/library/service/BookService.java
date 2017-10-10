@@ -10,8 +10,6 @@ public interface BookService {
 
     Book retrieve(long id);
 
-    Book update(long id, Book book);
-
     void delete(long id);
 
 }

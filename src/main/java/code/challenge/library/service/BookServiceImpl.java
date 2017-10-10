@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -17,14 +18,14 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Iterable<Book> list() {
-        logger.info("retrieving all books");
         return bookRepository.findAll();
     }
 
     @Override
     public Book create(Book book) {
-        // not duplicate book-> author & title
-        // not empty
+        if(book == null || StringUtils.isEmpty(book.getAuthor()) || StringUtils.isEmpty(book.getTitle())) {
+            throw new IllegalArgumentException("Invalid title or author for book");
+        }
         return bookRepository.save(book);
     }
 
@@ -35,12 +36,6 @@ public class BookServiceImpl implements BookService {
             throw new BookNotFoundException(id);
         }
         return book;
-    }
-
-    @Override
-    public Book update(long id, Book book) {
-        logger.info("BookService:update is NOT implemented");
-        return null;
     }
 
     @Override

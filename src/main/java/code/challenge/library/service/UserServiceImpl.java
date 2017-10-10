@@ -54,7 +54,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        if (userRepository.findOne(user.getUsername()) != null) {
+
+        if(user == null || StringUtils.isEmpty(user.getUsername())) {
+            throw new IllegalArgumentException("Invalid username");
+        }
+
+        if(userRepository.findOne(user.getUsername()) != null) {
             throw new DuplicateUsernameException(user.getUsername());
         }
         return userRepository.save(user);
@@ -109,6 +114,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserBook markBook(String username, Long bookId, UserBookStatus status) {
+        if(status == null) {
+            throw new IllegalArgumentException("status must be provided");
+        }
         UserBook userBook = getUserBook(username, bookId);
         userBook.setStatus(status);
         userBookRepository.save(userBook);
@@ -121,15 +129,19 @@ public class UserServiceImpl implements UserService {
         User user = getUser(username);
 
         // retrieve books with given status otherwise get all books
-        Stream<UserBook> userBooks = status != null ? userBookRepository.findByUserAndStatus(user, status).stream()
-                : user.getBooks().stream();
+        List<UserBook> userBooks = new ArrayList<>();
+        if(status != null) {
+            userBooks = userBookRepository.findByUserAndStatus(user, status);
+        } else {
+            userBooks = userBookRepository.findByUser(user);
+        }
 
         // filter out books not by author
         if(!StringUtils.isEmpty(author)) {
-            return userBooks.filter(a -> a.getBook().getAuthor().toLowerCase().equals(author.toLowerCase())).collect(Collectors.toList());
+            return userBooks.stream().filter(a -> a.getBook().getAuthor().toLowerCase().equals(author.toLowerCase())).collect(Collectors.toList());
         }
 
-        return userBooks.collect(Collectors.toList());
+        return userBooks;
     }
 
     private User getUser(String username) {
